@@ -2,6 +2,10 @@
 
 부동산 시장 지표들의 **인과관계**를 한 눈에 보고, 각 지표의 실데이터 추세를 지역별로 조망하는 싱글페이지 웹앱.
 
+**Live**: https://nalm.github.io/estate-index/ (main 푸시 시 GitHub Actions로 자동 배포)
+
+> 데이터 갱신: 로컬에서 `npm run refresh` 실행(API 키 필요) → `public/data/snapshot.json` 커밋·푸시하면 사이트에 반영된다.
+
 ## 개발
 
 ```bash
