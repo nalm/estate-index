@@ -1,0 +1,8 @@
+[
+  { "id": "pe1", "nodeId": "policy-fin", "date": "2022-07", "title": "DSR 3단계 확대", "direction": "tighten", "note": "차주단위 DSR 40% 전면 적용" },
+  { "id": "pe2", "nodeId": "macro-rate", "date": "2022-10", "title": "기준금리 3.0%", "direction": "tighten", "note": "빅스텝 — PF·수요 동반 위축 방아쇠" },
+  { "id": "pe3", "nodeId": "policy-tax", "date": "2023-01", "title": "양도세 중과 한시 배제 연장", "direction": "ease", "note": "다주택 매물 출회 유도" },
+  { "id": "pe4", "nodeId": "policy-supply", "date": "2023-09", "title": "9·26 공급 활성화", "direction": "ease", "note": "공공·정비사업 속도전" },
+  { "id": "pe5", "nodeId": "policy-fin", "date": "2024-09", "title": "스트레스 DSR 2단계", "direction": "tighten", "note": "수도권 가산금리 상향" },
+  { "id": "pe6", "nodeId": "macro-rate", "date": "2024-10", "title": "기준금리 인하 개시", "direction": "ease", "note": "3.5%→3.25% 피벗" }
+]
