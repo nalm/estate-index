@@ -88,9 +88,9 @@ function Flow() {
         pathOptions: { borderRadius: 14 },
         label: e.label || undefined,
         labelShowBg: true,
-        labelStyle: { fontSize: 10, fill: '#475569' },
-        labelBgStyle: { fill: '#ffffffcc' },
-        labelBgPadding: [3, 1],
+        labelStyle: { fontSize: 13, fontWeight: 600, fill: '#334155' },
+        labelBgStyle: { fill: '#ffffffe6' },
+        labelBgPadding: [5, 2],
         style: {
           stroke: color,
           strokeWidth: width,
@@ -116,11 +116,11 @@ function Flow() {
 
   const onFit = useCallback(() => rf.current?.fitView({ padding: 0.15, duration: 400 }), [])
 
-  // 배치 모드 전환 시 화면 다시 맞춤.
+  // 배치 전환·타임라인 토글·데이터 로드로 캔버스 크기/내용이 바뀌면 화면 다시 맞춤.
   useEffect(() => {
-    const t = setTimeout(() => rf.current?.fitView({ padding: 0.15, duration: 400 }), 60)
+    const t = setTimeout(() => rf.current?.fitView({ padding: 0.12, duration: 400 }), 80)
     return () => clearTimeout(t)
-  }, [layoutMode])
+  }, [layoutMode, showTimeline, snapshot])
 
   if (error) {
     return <div className="flex h-full items-center justify-center text-red-600">데이터 로드 오류: {error}</div>

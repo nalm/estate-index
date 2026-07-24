@@ -20,21 +20,20 @@ export default function PolicyTimeline({ events, months, onSelect }) {
   const sorted = [...(events || [])].sort((a, b) => a.date.localeCompare(b.date))
 
   return (
-    <div className="border-t border-slate-200 bg-white px-4 py-2">
-      <div className="mb-1 flex items-center gap-3">
-        <span className="text-xs font-semibold text-slate-700">정책 타임라인</span>
-        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+    // 모바일에서는 마커가 겹쳐 가독성이 없어 숨김 (md 이상에서만 표시)
+    <div className="hidden border-t border-slate-200 bg-white px-4 py-1.5 md:block">
+      <div className="relative h-[62px]">
+        {/* 좌측 제목·범례 (인라인으로 높이 절약) */}
+        <div className="absolute left-0 top-[40px] flex items-center gap-2 text-[11px] text-slate-500">
+          <span className="font-semibold text-slate-600">정책 타임라인</span>
           <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#dc2626' }} /> 강화
-          <span className="ml-2 inline-block h-2 w-2 rounded-full" style={{ background: '#2563eb' }} /> 완화
-        </span>
-      </div>
-
-      <div className="relative h-[68px]">
+          <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#2563eb' }} /> 완화
+        </div>
         {/* 기준선 */}
-        <div className="absolute left-0 right-0 top-[46px] h-px bg-slate-200" />
+        <div className="absolute left-0 right-0 top-[44px] h-px bg-slate-200" />
         {/* 연도 눈금 */}
         {years.map((y, k) => (
-          <div key={k} className="absolute top-[48px] -translate-x-1/2 text-[9px] text-slate-400" style={{ left: `${y.left}%` }}>
+          <div key={k} className="absolute top-[47px] -translate-x-1/2 text-[10px] text-slate-400" style={{ left: `${y.left}%` }}>
             {y.label}
           </div>
         ))}
@@ -49,10 +48,10 @@ export default function PolicyTimeline({ events, months, onSelect }) {
               onClick={() => onSelect?.(ev.nodeId)}
               title={`${ev.date} · ${ev.title} — ${ev.note}`}
               className="absolute -translate-x-1/2 cursor-pointer"
-              style={{ left: `${left}%`, top: up ? 0 : 26 }}
+              style={{ left: `${left}%`, top: up ? 0 : 22 }}
             >
               <div
-                className="max-w-[110px] truncate rounded px-1 py-0.5 text-[9px] font-medium text-white"
+                className="max-w-[130px] truncate rounded px-1.5 py-0.5 text-[11px] font-medium text-white"
                 style={{ background: color }}
               >
                 {ev.title}
@@ -60,7 +59,7 @@ export default function PolicyTimeline({ events, months, onSelect }) {
               {/* 스템 + 점 (기준선까지) */}
               <div
                 className="mx-auto w-px bg-slate-300"
-                style={{ height: up ? 30 : 4 }}
+                style={{ height: up ? 22 : 2 }}
               />
               <div className="mx-auto h-2 w-2 rounded-full ring-2 ring-white" style={{ background: color }} />
             </button>

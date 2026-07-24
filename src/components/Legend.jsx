@@ -1,15 +1,32 @@
+import { useState } from 'react'
 import { LAYER_META, LAYER_ORDER } from '../lib/layers.js'
 import { STATUS_META, STATUS_ORDER } from '../lib/status.js'
 
-// 좌하단 고정 범례: 층위 색상 + 엣지 의미
+// 좌하단 범례. 기본 접힘 — 다이어그램을 가리지 않도록 버튼으로 펼침.
 export default function Legend() {
+  const [open, setOpen] = useState(false)
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="absolute bottom-4 left-4 z-10 rounded-full border border-slate-300 bg-white/95 px-3 py-1.5 text-sm font-medium text-slate-600 shadow-md backdrop-blur hover:bg-slate-50"
+      >
+        ⓘ 범례
+      </button>
+    )
+  }
+
   return (
-    <div className="pointer-events-none absolute bottom-4 left-4 z-10 rounded-lg border border-slate-200 bg-white/95 p-3 text-xs shadow-md backdrop-blur">
-      <div className="mb-1.5 font-semibold text-slate-700">층위</div>
+    <div className="absolute bottom-4 left-4 z-10 rounded-lg border border-slate-200 bg-white/95 p-3 text-[13px] shadow-md backdrop-blur">
+      <div className="mb-1.5 flex items-center justify-between gap-4">
+        <span className="font-semibold text-slate-700">층위</span>
+        <button onClick={() => setOpen(false)} className="rounded px-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="범례 접기">✕</button>
+      </div>
       <div className="mb-2 grid grid-cols-1 gap-1">
         {LAYER_ORDER.map((key) => (
           <div key={key} className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-sm" style={{ background: LAYER_META[key].color }} />
+            <span className="inline-block h-3.5 w-3.5 rounded-sm" style={{ background: LAYER_META[key].color }} />
             <span className="text-slate-600">{LAYER_META[key].name}</span>
           </div>
         ))}
@@ -36,7 +53,7 @@ export default function Legend() {
           return (
             <div key={k} className="flex items-center gap-1.5 text-slate-600">
               <span
-                className="inline-flex h-3.5 w-3.5 items-center justify-center rounded text-[9px] font-bold"
+                className="inline-flex h-4 w-4 items-center justify-center rounded text-[10px] font-bold"
                 style={{ background: m.bg, color: m.color }}
               >
                 {m.short}

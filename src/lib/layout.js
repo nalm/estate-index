@@ -1,8 +1,8 @@
 import dagre from '@dagrejs/dagre'
 
 // 노드 크기 (레이아웃 계산용 — 실제 렌더 크기와 근사).
-const NODE_W = 200
-const nodeH = (node) => (node.kind === 'policy' ? 76 : 128)
+const NODE_W = 236
+const nodeH = (node) => (node.kind === 'policy' ? 84 : 148)
 
 // dagre로 좌→우 계층 배치 계산. 교차 최소화 + 랭크 정렬.
 // 반환: { [id]: {x, y} } (React Flow position = 좌상단 기준)

@@ -17,23 +17,23 @@ function IndicatorNode({ data }) {
       className="rounded-lg border-2 bg-white shadow-sm transition-opacity"
       style={{
         borderColor: color,
-        width: 190,
+        width: 224,
         opacity: dimmed ? 0.15 : 1,
         boxShadow: selected ? `0 0 0 3px ${color}55` : undefined,
       }}
     >
       <Handle type="target" position={Position.Left} style={{ background: color }} />
       <div
-        className="flex items-center gap-1.5 rounded-t-md px-2.5 py-1.5"
+        className="flex items-center gap-1.5 rounded-t-md px-3 py-2"
         style={{ background: soft }}
       >
-        <span className="flex-1 text-[13px] font-semibold leading-tight text-slate-800">
+        <span className="flex-1 text-[15px] font-bold leading-tight text-slate-800">
           {node.label}
         </span>
         {sm && (
           <span
             title={`출처: ${sm.label}`}
-            className="shrink-0 rounded px-1 py-0.5 text-[9px] font-bold leading-none"
+            className="shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold leading-none"
             style={{ background: sm.bg, color: sm.color }}
           >
             {sm.short}
@@ -41,27 +41,27 @@ function IndicatorNode({ data }) {
         )}
       </div>
 
-      <div className="px-2.5 py-2">
+      <div className="px-3 py-2">
         {isPolicy ? (
-          <div className="text-[11px] text-slate-500">정책 이벤트 · 타임라인 참조</div>
+          <div className="text-[13px] text-slate-500">정책 이벤트 · 타임라인 참조</div>
         ) : stat ? (
           <>
             <div className="flex items-baseline justify-between">
-              <span className="text-base font-bold text-slate-900">
+              <span className="text-lg font-bold text-slate-900">
                 {formatNum(stat.value)}
-                <span className="ml-0.5 text-[10px] font-normal text-slate-400">{node.unit}</span>
+                <span className="ml-1 text-[11px] font-normal text-slate-400">{node.unit}</span>
               </span>
-              <span className="text-[11px] font-semibold" style={{ color: deltaColor }}>
+              <span className="text-[13px] font-semibold" style={{ color: deltaColor }}>
                 {arrow} {Math.abs(stat.pct).toFixed(1)}%
               </span>
             </div>
             <div className="mt-1">
-              <Sparkline data={series} color={color} width={168} height={30} />
+              <Sparkline data={series} color={color} width={200} height={34} />
             </div>
-            <div className="mt-0.5 text-right text-[9px] text-slate-400">{stat.date}</div>
+            <div className="mt-0.5 text-right text-[11px] text-slate-400">{stat.date}</div>
           </>
         ) : (
-          <div className="text-[11px] text-slate-400">데이터 없음</div>
+          <div className="text-[13px] text-slate-400">데이터 없음</div>
         )}
       </div>
       <Handle type="source" position={Position.Right} style={{ background: color }} />
