@@ -63,6 +63,15 @@ export default function SidePanel({ node, indicators, snapshot, region, onClose,
           </div>
         )}
 
+        {!isPolicy && !stat && (
+          <div className="mb-4 rounded border border-slate-200 bg-slate-50 p-3">
+            <div className="mb-1 text-sm font-semibold text-slate-600">데이터 없음</div>
+            <p className="text-[13px] leading-relaxed text-slate-500">
+              {snapshot?.notes?.[node.id] || '이 지표는 아직 수집되지 않았습니다.'}
+            </p>
+          </div>
+        )}
+
         {isPolicy && (
           <div className="mb-4">
             <div className="mb-2 text-sm font-semibold text-slate-700">관련 정책 이벤트</div>

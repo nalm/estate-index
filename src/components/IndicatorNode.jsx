@@ -61,7 +61,9 @@ function IndicatorNode({ data }) {
             <div className="mt-0.5 text-right text-[11px] text-slate-400">{stat.date}</div>
           </>
         ) : (
-          <div className="text-[13px] text-slate-400">데이터 없음</div>
+          <div className="text-[13px] leading-snug text-slate-400">
+            {status === 'unavailable' ? '공개 데이터 없음' : '데이터 없음'}
+          </div>
         )}
       </div>
       <Handle type="source" position={Position.Right} style={{ background: color }} />

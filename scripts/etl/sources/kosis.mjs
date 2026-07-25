@@ -14,6 +14,16 @@ import { assertNoTodo, NotReady } from '../lib/errors.mjs'
 const DATA = 'https://kosis.kr/openapi/Param/statisticsParameterData.do'
 const META = 'https://kosis.kr/openapi/statisticsData.do'
 
+// KOSIS는 분당 200건 제한. 지표 7종 × 시도 18개 ≈ 130건이라 연속 실행 시 쉽게 걸린다.
+// 전역 간격 제한으로 예방 (350ms → 최대 ~171건/분).
+const MIN_INTERVAL_MS = 350
+let lastCallAt = 0
+async function throttle() {
+  const wait = lastCallAt + MIN_INTERVAL_MS - Date.now()
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait))
+  lastCallAt = Date.now()
+}
+
 // 'YYYY-MM' → 직전 달 'YYYY-MM'
 function prevMonth(ym) {
   let [y, m] = ym.split('-').map(Number)
@@ -50,6 +60,7 @@ async function regionCodeMap(cfg, key) {
     method: 'getMeta', apiKey: key, orgId: cfg.orgId, tblId: cfg.tblId,
     type: 'ITM', format: 'json', jsonVD: 'Y',
   })
+  await throttle()
   const j = await fetchJson(url)
   if (!Array.isArray(j)) throw new Error(`KOSIS getMeta: ${JSON.stringify(j).slice(0, 120)}`)
   const map = {}
@@ -92,6 +103,7 @@ export async function fetchSeries({ cfg, key, months, regions }) {
       if (!codes[region]) continue
       params[cfg.regionParam] = codes[region]
     }
+    await throttle()
     const json = await fetchJson(buildUrl(DATA, params))
     // err 30 = 해당 조합 데이터 없음 → 그 지역은 빈값으로 두고 계속(전국은 nationSum이 채움).
     if (json?.err && String(json.err) !== '30') throw new Error(`KOSIS: ${json.err} ${json.errMsg || ''}`)

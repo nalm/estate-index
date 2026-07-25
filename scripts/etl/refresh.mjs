@@ -35,6 +35,25 @@ const assembled = {}
 const status = {} // id → 'live' | 'manual' | 'derived' | 'mock'
 const notes = {}
 
+// 직전 스냅샷 — 일시적 수집 실패 시 실측을 잃지 않기 위해 재사용한다.
+const SNAPSHOT_PATH = join(ROOT, 'public/data/snapshot.json')
+let prevSnapshot = {}
+try {
+  prevSnapshot = JSON.parse(readFileSync(SNAPSHOT_PATH, 'utf-8'))
+} catch {
+  prevSnapshot = {} // 첫 실행
+}
+const staleIds = []
+
+// 직전 스냅샷에 쓸 만한(실측/수동) 값이 있으면 반환.
+function prevGood(id) {
+  const st = prevSnapshot?.status?.[id]
+  const series = prevSnapshot?.series?.[id]
+  if (!series || !['live', 'manual', 'derived'].includes(st)) return null
+  const hasData = Object.values(series).some((arr) => Array.isArray(arr) && arr.length > 0)
+  return hasData ? { series, status: st } : null
+}
+
 // 목업 폴백 생성.
 function fallback(node) {
   const rs = node.regional ? regions : ['전국']
@@ -62,9 +81,27 @@ for (const node of seriesNodes) {
     assembled[node.id] = data
     status[node.id] = provider === 'manual' ? 'manual' : 'live'
   } catch (e) {
-    assembled[node.id] = fallback(node)
-    status[node.id] = 'mock'
-    notes[node.id] = (e instanceof NotReady ? '미준비' : '오류') + ': ' + e.message
+    // 애초에 공개 데이터가 없는 지표(noPublicSource)는 목업으로 채우지 않는다.
+    // 가짜 값이 실측처럼 보이는 게 빈 값보다 나쁘기 때문 — UI가 '데이터 없음'으로 표시.
+    if (cfg.noPublicSource) {
+      assembled[node.id] = {}
+      status[node.id] = 'unavailable'
+      notes[node.id] = cfg.note
+      continue
+    }
+    // 일시적 실패(API 한도·네트워크)로 실측을 잃지 않도록 직전 스냅샷 값을 보존한다.
+    // 목업으로 덮으면 실패가 그럴듯한 가짜 데이터로 바뀌어 더 위험하다.
+    const kept = prevGood(node.id)
+    if (kept) {
+      assembled[node.id] = kept.series
+      status[node.id] = kept.status
+      notes[node.id] = `갱신 실패, 이전 값 유지(${prevSnapshot.generatedAt}): ${e.message}`
+      staleIds.push(node.id)
+    } else {
+      assembled[node.id] = fallback(node)
+      status[node.id] = 'mock'
+      notes[node.id] = (e instanceof NotReady ? '미준비' : '오류') + ': ' + e.message
+    }
   }
 }
 
@@ -94,6 +131,7 @@ const snapshot = {
   regions,
   series: assembled,
   status,
+  notes, // 지표별 상태 사유 (UI에서 '왜 데이터가 없는지' 설명에 사용)
   policyEvents,
 }
 
@@ -102,13 +140,20 @@ writeFileSync(join(ROOT, 'public/data/snapshot.json'), JSON.stringify(snapshot),
 
 // 요약 출력
 console.log(`\n스냅샷 생성 완료 → public/data/snapshot.json  (${months[0]}~${months.at(-1)})`)
-const order = { live: 0, derived: 1, manual: 2, mock: 3 }
-const icon = { live: '✅ 실데이터', derived: '🧮 파생', manual: '📄 수동', mock: '🟡 목업' }
+const order = { live: 0, derived: 1, manual: 2, mock: 3, unavailable: 4 }
+const icon = { live: '✅ 실데이터', derived: '🧮 파생', manual: '📄 수동', mock: '🟡 목업', unavailable: '⛔ 데이터없음' }
 for (const node of [...seriesNodes].sort((a, b) => order[status[a.id]] - order[status[b.id]])) {
   const s = status[node.id]
   console.log(`  ${icon[s].padEnd(9)} ${node.label}${notes[node.id] ? `  (${notes[node.id]})` : ''}`)
 }
 console.log(`\n  실데이터/파생 ${liveCount} · 수동 ${Object.values(status).filter((s) => s === 'manual').length} · 목업 ${Object.values(status).filter((s) => s === 'mock').length} / 총 ${seriesNodes.length}`)
-if (!snapshot.allLive) {
+if (Object.values(status).includes('mock')) {
   console.log('\n  ⓘ .env에 API 키를 넣고 mapping.mjs의 TODO 통계코드를 채우면 실데이터로 전환됩니다.')
+}
+const naSet = Object.entries(status).filter(([, v]) => v === 'unavailable').map(([id]) => id)
+if (naSet.length) {
+  console.log(`\n  ⓘ 공개 데이터가 없는 지표(${naSet.length}종)는 scripts/etl/manual/<id>.csv 를 채우면 반영됩니다.`)
+}
+if (staleIds.length) {
+  console.log(`\n  ⚠ ${staleIds.length}종은 이번 수집에 실패해 이전 값을 유지했습니다 — 잠시 후 재실행하세요.`)
 }

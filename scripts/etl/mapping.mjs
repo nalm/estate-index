@@ -115,8 +115,14 @@ export const SOURCE_MAP = {
   },
 
   // ── 공개 API 없음 → 수동 CSV (scripts/etl/manual/{id}.csv) ──
-  // 아실은 상업 서비스 약관상 자동 수집 부적절 → 수동 유지.
-  'flow-listing':   { provider: 'manual', regional: true,  note: '아실 등 매물량 (API 없음, 수동)' },
+  // 매물량은 신고의무가 없어 공공통계로 존재하지 않는다.
+  // 전수 확인(2026-07-25): KOSIS·KB(메뉴 01~08)·R-ONE(738표)·공공데이터포털 모두 없음.
+  // 민간(아실·네이버 부동산)은 robots.txt가 `User-agent: * / Disallow: /`로 봇 접근을
+  // 명시 거부 → 자동 수집하지 않는다. 수동 CSV만 유효한 경로.
+  'flow-listing': {
+    provider: 'manual', regional: true, noPublicSource: true,
+    note: '매물량 — 공개 API 없음(신고의무 없는 지표). 수동 CSV 입력 필요',
+  },
 }
 
 // provider별 필요한 키. 키 없으면 refresh가 폴백 처리.

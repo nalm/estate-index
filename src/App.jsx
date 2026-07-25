@@ -109,7 +109,7 @@ function Flow() {
 
   // 출처 요약 (실데이터/파생/수동/목업 개수)
   const statusCounts = useMemo(() => {
-    const c = { live: 0, derived: 0, manual: 0, mock: 0 }
+    const c = { live: 0, derived: 0, manual: 0, mock: 0, unavailable: 0 }
     for (const v of Object.values(snapshot?.status || {})) if (v in c) c[v]++
     return c
   }, [snapshot])
