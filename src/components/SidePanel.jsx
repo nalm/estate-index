@@ -107,6 +107,24 @@ export default function SidePanel({ node, indicators, snapshot, region, onClose,
           <Field label="발표 주기">{node.frequency}</Field>
         </div>
 
+        {/* 지표에 딸린 심층 리포트 (indicators.json의 report 필드) */}
+        {node.report && (
+          <a
+            href={`${import.meta.env.BASE_URL}${node.report.path}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mb-4 flex items-center justify-between gap-2 rounded border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+          >
+            <span>
+              <span className="font-semibold text-slate-700">{node.report.label}</span>
+              {node.report.desc && (
+                <span className="mt-0.5 block text-[12px] font-normal text-slate-500">{node.report.desc}</span>
+              )}
+            </span>
+            <span className="shrink-0 text-slate-400">↗</span>
+          </a>
+        )}
+
         <EdgeList title="이 지표가 영향을 주는 것" edges={outgoing} pick={(e) => e.target} labelOf={labelOf} onSelectNode={onSelectNode} />
         <EdgeList title="이 지표가 영향을 받는 것" edges={incoming} pick={(e) => e.source} labelOf={labelOf} onSelectNode={onSelectNode} />
       </div>
