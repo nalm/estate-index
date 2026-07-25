@@ -28,7 +28,18 @@ export async function fetchSeries({ id, cfg, months, regions }) {
   const vi = header.indexOf('value')
   if (di < 0 || vi < 0) throw new Error(`manual/${file}: date,value 헤더 필요`)
 
+  // 신뢰할 수 없는 구간 제외 규칙. 원본 CSV는 손대지 않으므로
+  // 나중에 같은 파일을 다시 내려받아 덮어써도 제외가 유지된다.
+  // 형식: [{ region: '광주', before: '2022-03' }, ...]  (before/after 는 'YYYY-MM', 경계 미포함)
+  const excludes = cfg?.exclude || []
+  const isExcluded = (region, date) =>
+    excludes.some((x) =>
+      (!x.region || x.region === region) &&
+      (!x.before || date < x.before) &&
+      (!x.after || date > x.after))
+
   const byRegion = {}
+  let excluded = 0
   for (const line of lines) {
     if (!line.trim()) continue
     const c = line.split(',')
@@ -36,9 +47,11 @@ export async function fetchSeries({ id, cfg, months, regions }) {
     const region = ri >= 0 ? (c[ri]?.trim() || '전국') : '전국'
     const value = Number(c[vi])
     if (!date || !Number.isFinite(value)) continue
+    if (isExcluded(region, date)) { excluded++; continue }
     ;(byRegion[region] ||= {})[date] = value
   }
   if (Object.keys(byRegion).length === 0) throw new NotReady(`manual/${file} 비어있음`)
+  if (excluded) console.log(`    ↳ manual/${file}: 신뢰구간 제외 ${excluded}행`)
 
   const out = {}
   const target = Object.keys(byRegion)
