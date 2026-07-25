@@ -121,7 +121,8 @@ export const SOURCE_MAP = {
   // 명시 거부 → 자동 수집하지 않는다. 수동 CSV만 유효한 경로.
   'flow-listing': {
     provider: 'manual', regional: true, noPublicSource: true,
-    note: '매물량 — 공개 API 없음(신고의무 없는 지표). 수동 CSV 입력 필요',
+    manualFile: 'asil_offer_counts_2021-01_2026-06.csv', // 아실 매물 건수 집계 (전국+시도17, 2021-01~2026-06)
+    note: '매물량 — 공개 API 없음(신고의무 없는 지표). 아실 집계를 수동 입력',
   },
 }
 
